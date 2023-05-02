@@ -1,0 +1,1 @@
+A route is exposes a service that's running inside of openshift to a hostname

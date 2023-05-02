@@ -1,0 +1,1 @@
+oc autoscale deployment/name --min=2 --max=7

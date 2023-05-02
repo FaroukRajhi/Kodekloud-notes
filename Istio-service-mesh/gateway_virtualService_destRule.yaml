@@ -1,0 +1,55 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: my-gateway
+  namespace: my-namespace
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - example.com
+        - www.example.com
+      tls:
+        mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: my-service
+  namespace: my-namespace
+spec:
+  hosts:
+    - example.com
+    - www.example.com
+  gateways:
+    - my-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /api
+      route:
+        - destination:
+            host: api.my-service.svc.cluster.local
+            port:
+              number: 8080
+    - route:
+        - destination:
+            host: web.my-service.svc.cluster.local
+            port:
+              number: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: my-service
+  namespace: my-namespace
+spec:
+  host: my-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
